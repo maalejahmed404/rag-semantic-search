@@ -57,30 +57,61 @@ print(f"Known ingredients: {len(KNOWN_INGREDIENTS)}\n")
 
 def extract_ingredient(query: str):
     """Use fast matching + LLM fallback to extract ingredient from query.
-    Returns a list of matching ingredient names, or None."""
+    Returns a list of matching ingredient names, or None.
+    Supports partial names (e.g. 'AMG1400' matches 'BVZyme TDS AMG1400')
+    and multi-ingredient queries."""
     
-    # First: try fast exact/substring match (no LLM needed)
     query_lower = query.lower()
+    query_tokens = [t for t in query_lower.split() if len(t) >= 4]
+    matched = []
+
+    # Build set of common tokens that appear in many ingredient names
+    # These are too generic to be useful for matching (e.g. "bvzyme", "enzyme")
+    all_ing_lower = [ing.lower() for ing in KNOWN_INGREDIENTS]
+    common_tokens = set()
+    for tok in query_tokens:
+        hit_count = sum(1 for ing_l in all_ing_lower if tok in ing_l)
+        if hit_count > max(1, len(KNOWN_INGREDIENTS) * 0.3):
+            common_tokens.add(tok)
+    
+    # Only use distinctive tokens for partial matching
+    distinctive_tokens = [t for t in query_tokens if t not in common_tokens]
+
     for ing in KNOWN_INGREDIENTS:
         ing_lower = ing.lower()
         # Clean versions: remove "TDS", "pdf", parentheses
         clean = ing_lower.replace("tds", "").replace("pdf", "").replace("(1)", "").strip()
         clean_words = [w for w in clean.split() if len(w) > 2]
-        
+
+        # Strategy 1: full ingredient name found in query
         if ing_lower in query_lower:
-            return [ing]
+            matched.append(ing)
+            continue
+
+        # Strategy 2: any DISTINCTIVE query token found inside ingredient name
+        #   e.g. query="AMG1400" matches ingredient="BVZyme TDS AMG1400"
+        #   but "bvzyme" is ignored because it appears in too many ingredients
+        if distinctive_tokens and any(tok in ing_lower for tok in distinctive_tokens):
+            matched.append(ing)
+            continue
+
+        # Strategy 3: all cleaned ingredient words found in query
         if clean_words and all(w in query_lower for w in clean_words):
-            return [ing]
+            matched.append(ing)
+            continue
+
+    if matched:
+        return matched
     
     # If no fast match: ask the LLM
     ing_list = "\n".join(f"- {ing}" for ing in KNOWN_INGREDIENTS)
     prompt = (
-        "From the following user query, extract the ingredient name if one is mentioned.\n"
+        "From the following user query, extract the ingredient name(s) if any are mentioned.\n"
         "Here is the list of known ingredients:\n"
         f"{ing_list}\n\n"
         "User query: " + query + "\n\n"
         "RULES:\n"
-        "- If the query mentions a specific ingredient from the list above, return EXACTLY that ingredient name.\n"
+        "- If the query mentions one or more specific ingredients from the list above, return EXACTLY those ingredient names separated by '|'.\n"
         "- If the query mentions a general ingredient type (like 'alpha-amylase', 'xylanase', 'lipase', 'transglutaminase', 'glucose oxidase', 'ascorbic acid'), return ALL matching ingredients separated by '|'.\n"
         "- If no specific ingredient is mentioned, return exactly: NONE\n"
         "- Return ONLY the ingredient name(s), nothing else."

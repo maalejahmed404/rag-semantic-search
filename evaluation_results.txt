@@ -1,6 +1,6 @@
 ======================================================================
 RAG SYSTEM EVALUATION REPORT
-Date: 2026-02-28 | Queries: 100 | Time: 36.9s
+Date: 2026-02-28 | Queries: 100 | Time: 140.0s
 ======================================================================
 
 CONFIGURATION
@@ -117,48 +117,51 @@ LLM FAITHFULNESS (12 samples, filtered retrieval)
 ======================================================================
 
 Average Faithfulness Score: 33.33%
-Refusal Rate: 25.00%
+Refusal Rate: 16.67%
 Correct Refusals (no relevant retrieval): 2
-Incorrect Refusals (had relevant retrieval): 1
+Incorrect Refusals (had relevant retrieval): 0
 
 Q20: Combien de acide ascorbique pour 50 kg de farine ?
   Expected Ingredient: acide ascorbique
   Ground Truth: Poids Farine: 50 kg | 50 ppm: 2,5 g | 75 ppm: 3,75 g | 100 ppm: 5 g | 150 ppm: 7
   Faithfulness: 100%
   Refused: False, Retrieval had answer: True
-  LLM Answer: Pour 50 kg de farine (ppm correspondants) :
-- 50 ppm : 2,5 g
-- 75 ppm : 3,75 g
-- 100 ppm : 5 g
-- 150 ppm : 7,5 g...
+  LLM Answer: Pour 50 kg de farine, selon le ppm:
+
+- 50 ppm: 2,5 g
+- 75 ppm: 3,75 g
+- 100 ppm: 5 g
+- 150 ppm: 7,5 g...
 
 Q12: Quelle est l'activité enzymatique de BVZyme TDS A FRESH202 ?
   Expected Ingredient: BVZyme TDS A FRESH202
   Ground Truth: Activity 10950 NMAU/g
   Faithfulness: 0%
   Refused: False, Retrieval had answer: False
-  LLM Answer: Activité enzymatique: maltogenic amylase....
+  LLM Answer: ERROR: error, status code: 502, status: 502 Bad Gateway, message: invalid character '<' looking for beginning of value, body: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-U...
 
 Q8: Quels allergènes contient BVZyme TDS L MAX X ?
   Expected Ingredient: BVZyme TDS L MAX X
   Ground Truth: In compliance with the list of major allergens in Annex II, Regulation 1169/2011
   Faithfulness: 0%
-  Refused: True, Retrieval had answer: True
-  LLM Answer: Information non disponible...
+  Refused: False, Retrieval had answer: True
+  LLM Answer: ERROR: error, status code: 502, status: 502 Bad Gateway, message: invalid character '<' looking for beginning of value, body: <!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-U...
 
 Q37: Quels sont les avantages de Levain naturel comme alternative au acide ascorbique
   Expected Ingredient: acide ascorbique
   Ground Truth: Alternative: Levain naturel | Avantages: Action douce, saveur | Inconvénients: T
   Faithfulness: 0%
   Refused: False, Retrieval had answer: True
-  LLM Answer: Avantages : action douce et saveur....
+  LLM Answer: Lelevain naturel offre une action douce et une meilleure saveur....
 
 Q13: A quoi sert BVZyme TDS L MAX X en boulangerie ?
   Expected Ingredient: BVZyme TDS L MAX X
   Ground Truth: Application B V Zyme L MAX X® is used in bakery as it hydrolyzes esterbonds in g
   Faithfulness: 0%
   Refused: False, Retrieval had answer: True
-  LLM Answer: BVZyme TDS L MAX X est une lipase produite par Aspergillus niger qui hydrolyse les esters des glycerides, utilisée pour augmenter le volume, obtenir une mie fine et régulière, et améliorer la stabilit...
+  LLM Answer: BVZyme TDS L MAX X est une lipase utilisée en boulangerie pour hydrolyser les ester bonds des glycerides; elle augmente le volume, améliore la structure de la mie (fine et régulière), la stabilité et ...
 
   ... (7 more samples omitted)
 
