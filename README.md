@@ -2,6 +2,10 @@
 
 This project implements a highly accurate, language-agnostic Retrieval-Augmented Generation (RAG) pipeline tailored for complex technical documents, such as Technical Data Sheets containing strict specifications, regulatory bounds, and tabular comparisons across various ingredients/products.
 
+<img width="1824" height="971" alt="image" src="https://github.com/user-attachments/assets/5d51aea9-cb08-4b21-879d-90cabae17a11" />
+<img width="823" height="960" alt="image" src="https://github.com/user-attachments/assets/feabfbad-366c-4345-abdc-952e6c20c4f2" />
+
+
 ## Pipeline Architecture
 
 ```mermaid
