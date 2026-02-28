@@ -1,7 +1,9 @@
 # Advanced RAG System for Technical Document Retrieval
 
 This project implements a highly accurate, language-agnostic Retrieval-Augmented Generation (RAG) pipeline tailored for complex technical documents, such as Technical Data Sheets containing strict specifications, regulatory bounds, and tabular comparisons across various ingredients/products.
-<img width="1159" height="980" alt="image" src="https://github.com/user-attachments/assets/81049d04-460f-4014-91c5-f27001c205e6" />
+<img width="1388" height="965" alt="image" src="https://github.com/user-attachments/assets/1c59d856-e200-4d56-979c-fed3f23d6536" />
+<img width="1057" height="968" alt="image" src="https://github.com/user-attachments/assets/4faab40d-e080-4c83-b691-9735db62abc5" />
+<img width="1254" height="963" alt="image" src="https://github.com/user-attachments/assets/f4305fd2-1342-4bd6-8ff8-2abf029f481a" />
 
 ## Pipeline Architecture
 
