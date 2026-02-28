@@ -1,6 +1,6 @@
 ======================================================================
 RAG SYSTEM EVALUATION REPORT
-Date: 2026-02-28 | Queries: 100 | Time: 37.2s
+Date: 2026-02-28 | Queries: 100 | Time: 37.6s
 ======================================================================
 
 CONFIGURATION
@@ -129,8 +129,8 @@ LLM FAITHFULNESS (15 samples, filtered retrieval)
 ======================================================================
 
 Average Faithfulness Score: 16.67%
-Refusal Rate: 20.00%
-Correct Refusals (no relevant retrieval): 1
+Refusal Rate: 26.67%
+Correct Refusals (no relevant retrieval): 2
 Incorrect Refusals (had relevant retrieval): 2
 
 Q14: Combien de acide ascorbique pour 500 kg de farine ?
@@ -139,10 +139,11 @@ Q14: Combien de acide ascorbique pour 500 kg de farine ?
   Faithfulness: 100%
   Refused: False, Retrieval had answer: True
   LLM Answer: Pour 500 kg de farine :
-- 50 ppm → 25 g d’acide ascorbique  
-- 75 ppm → 37,5 g  
-- 100 ppm → 50 g  
-- 150 ppm → 75 g...
+
+- 50 ppm → 25 g d’acide ascorbique  
+- 75 ppm → 37,5 g d’acide ascorbique  
+- 100 ppm → 50 g d’acide ascorbique  
+- 150 ppm → 75 g d’acide ascorbique...
 
 Q13: Quel est le dosage de acide ascorbique pour glutenique ?
   Expected Ingredient: acide ascorbique
@@ -156,7 +157,7 @@ Q43: Quelle est l'activité enzymatique de BVZyme TDS L55pdf ?
   Ground Truth: Activity 1120 U/g
   Faithfulness: 0%
   Refused: False, Retrieval had answer: False
-  LLM Answer: L’activité enzymatique de BVZyme L55 est celle d’une phospholipase (lipase)....
+  LLM Answer: Son activité enzymatique est celle d’une phospholipase (lipase)....
 
 Q75: Quels allergènes contient BVZyme GO MAX 63 TDS ?
   Expected Ingredient: BVZyme GO MAX 63 TDS
@@ -170,7 +171,7 @@ Q18: Quels sont les avantages de Acide ascorbique + enzymes comme alternative au
   Ground Truth: Alternative: Acide ascorbique + enzymes | Avantages: Synérgie optimale | Inconvé
   Faithfulness: 0%
   Refused: False, Retrieval had answer: True
-  LLM Answer: Synérgie optimale....
+  LLM Answer: Avantage : une synergie optimale entre l’acide ascorbique et les enzymes....
 
   ... (10 more samples omitted)
 

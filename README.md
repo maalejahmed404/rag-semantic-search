@@ -2,6 +2,57 @@
 
 This project implements a highly accurate, language-agnostic Retrieval-Augmented Generation (RAG) pipeline tailored for complex technical documents, such as Technical Data Sheets containing strict specifications, regulatory bounds, and tabular comparisons across various ingredients/products.
 
+## Pipeline Architecture
+
+```mermaid
+flowchart TB
+    subgraph OFFLINE["⚙️ Offline Indexing Pipeline"]
+        direction TB
+        PDF["📄 PDF Technical Data Sheets<br/>(30+ documents)"]
+        CH["chunking.py<br/>Layout-aware parsing"]
+        JSON["📋 JSON Chunks<br/>(275 merged chunks)"]
+        EXP["build_database.py<br/>Ingredient Explosion"]
+        DB[("🗄️ ChromaDB<br/>844 entries<br/>all-MiniLM-L6-v2")]
+
+        PDF --> CH
+        CH -->|"Text + Table extraction<br/>Heading detection<br/>Deduplication"| JSON
+        JSON --> EXP
+        EXP -->|"1 chunk × N ingredients<br/>→ N entries (1 each)"| DB
+    end
+
+    subgraph ONLINE["🔍 Online Retrieval Pipeline (rag_chatbot.py)"]
+        direction TB
+        Q["🗣️ User Query<br/>(any language)"]
+        IE["🏷️ Ingredient Extraction<br/>(exact match + LLM fallback)"]
+        TR["🌐 Query Translation<br/>(→ English + French)"]
+        HY["💡 HyDE Generation<br/>(hypothetical document)"]
+        EMB["📐 Embed 3 vectors<br/>(EN + FR + HyDE)"]
+        RET["🔎 ChromaDB Retrieval<br/>(Top-15 × 3 queries)<br/>+ Metadata Filter"]
+        RR["🏆 Cross-Encoder Reranking<br/>(ms-marco-MiniLM, English query)<br/>→ Top-3"]
+        LLM["🤖 LLM Answer Generation<br/>(gpt-oss-120b)"]
+        ANS["✅ Final Answer"]
+
+        Q --> IE
+        IE -->|"ingredient name"| RET
+        Q --> TR
+        TR --> EMB
+        Q --> HY
+        HY --> EMB
+        EMB --> RET
+        RET -->|"~15 candidates"| RR
+        RR -->|"Top-3 context"| LLM
+        LLM --> ANS
+    end
+
+    DB -.->|"vector search<br/>+ where filter"| RET
+
+    style OFFLINE fill:#1a1a2e,stroke:#16213e,color:#e94560
+    style ONLINE fill:#0f3460,stroke:#16213e,color:#e94560
+    style DB fill:#533483,stroke:#e94560,color:#fff
+    style RR fill:#e94560,stroke:#fff,color:#fff
+    style ANS fill:#00b894,stroke:#fff,color:#fff
+```
+
 ## 1. The Chunking Strategy (`chunking.py`)
 
 The extraction and chunking strategy is designed to parse highly complex PDF documents into structured, retrieval-ready JSON chunks.
