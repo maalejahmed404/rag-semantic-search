@@ -10,8 +10,11 @@ RAG chatbot with:
 import os
 import json
 import chromadb
+from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer, CrossEncoder
 from openai import OpenAI
+
+load_dotenv()
 
 # ── Config ──
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,13 +23,12 @@ COLLECTION_NAME = "ingredients_rag"
 TOP_K = 3
 PRE_FETCH_K = 15
 
-# Lightning AI LLM (free tier: 700M+ tokens)
-# Set your API key: set LIGHTNING_API_KEY=your-key-here
+# Lightning AI LLM
 LLM_CLIENT = OpenAI(
     base_url="https://lightning.ai/api/v1/",
     api_key=os.environ.get("LIGHTNING_API_KEY", "YOUR_API_KEY_HERE"),
 )
-LLM_MODEL = "lightning-ai/gpt-oss-120b"
+LLM_MODEL = "openai/gpt-5-nano"
 
 # ── Load Models (once) ──
 print("Loading embedding model ...")

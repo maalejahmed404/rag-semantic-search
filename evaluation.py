@@ -31,9 +31,9 @@ TOP_K_VALUES = [1, 3, 5, 10]
 # Set your API key: set LIGHTNING_API_KEY=your-key-here
 LLM_CLIENT = OpenAI(
     base_url="https://lightning.ai/api/v1/",
-    api_key=os.environ.get("LIGHTNING_API_KEY", "YOUR_API_KEY_HERE"),
+    api_key="0480c8df-a6dc-479d-bbdb-8078edc15b92/maalejahmed84/financial-llm-training-project",
 )
-LLM_MODEL = "lightning-ai/gpt-oss-120b"
+LLM_MODEL = "openai/gpt-5-nano"
 
 # ── Load resources ──
 print("Loading resources...")
