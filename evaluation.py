@@ -61,34 +61,57 @@ print(f"Known ingredients: {len(KNOWN_INGREDIENTS)}\n")
 # ═══════════════════════════════════════════════════════════
 
 def generate_benchmark_queries(chunks):
-    """Generate 100 diverse queries from actual chunk data.
+    """Generate 100 diverse queries at MULTIPLE DIFFICULTY LEVELS.
+    
+    DIFFICULTY TIERS:
+    - EASY (40%): Direct questions with exact ingredient name
+    - MEDIUM (30%): Partial names, abbreviations, indirect product references
+    - HARD (20%): Natural language, problem-solving, no exact ingredient name
+    - ADVERSARIAL (10%): Cross-ingredient comparison, confusion queries
     
     Each query has:
     - query_en / query_fr: the question in EN and FR
     - expected_ingredient: the EXACT ingredient name that MUST match
     - ground_truth_text: the exact text that should be in the retrieved doc
-    - expected_section: the section type for categorization
     - category: query category for per-category analysis
+    - difficulty: easy/medium/hard/adversarial
     """
     queries = []
-    seen_keys = set()  # avoid exact duplicates
+    seen_keys = set()
     
+    # Build per-ingredient index for harder query generation
+    ingredient_data = {}
     for idx, c in enumerate(chunks):
         text = c.get("chunk text", c.get("row text", "")).replace("\n", " ").strip()
         while "  " in text:
             text = text.replace("  ", " ")
         if len(text) < 10:
             continue
-        
+        section = c.get("section title", "").lower()
+        ingredients = c.get("ingredients", [])
+        for ing in ingredients:
+            if ing not in ingredient_data:
+                ingredient_data[ing] = []
+            ingredient_data[ing].append({
+                "text": text, "section": section, "chunk_index": idx, "chunk": c
+            })
+    
+    # ═══════════════════════════════════════
+    # TIER 1: EASY — exact ingredient name, direct question
+    # ═══════════════════════════════════════
+    for idx, c in enumerate(chunks):
+        text = c.get("chunk text", c.get("row text", "")).replace("\n", " ").strip()
+        while "  " in text:
+            text = text.replace("  ", " ")
+        if len(text) < 10:
+            continue
         section = c.get("section title", "").lower()
         ingredients = c.get("ingredients", [])
         if not ingredients:
             continue
         
-        # For each ingredient in this chunk, generate a query
         for ing in ingredients:
-            key = None
-            q_en = q_fr = cat = None
+            key = q_en = q_fr = cat = None
             
             if section.startswith("dosage") and "ppm" in text.lower():
                 key = f"dosage_{ing}"
@@ -159,7 +182,7 @@ def generate_benchmark_queries(chunks):
                 q_en = f"What are the important points about {ing}?"
                 q_fr = f"Quels sont les points importants de {ing} ?"
                 cat = "important_points"
-            elif section.startswith("limitation") and len(text) > 30:
+            elif section.startswith("limitations") and len(text) > 30:
                 key = f"limitations_{ing}"
                 q_en = f"What are the limitations of {ing}?"
                 q_fr = f"Quelles sont les limitations de {ing} ?"
@@ -190,37 +213,182 @@ def generate_benchmark_queries(chunks):
             if key and key not in seen_keys:
                 seen_keys.add(key)
                 queries.append({
-                    "query_en": q_en,
-                    "query_fr": q_fr,
+                    "query_en": q_en, "query_fr": q_fr,
                     "expected_ingredient": ing,
                     "ground_truth_text": text,
-                    "expected_section": cat,
-                    "category": cat,
-                    "chunk_index": idx,
+                    "expected_section": cat, "category": cat,
+                    "difficulty": "easy", "chunk_index": idx,
                 })
     
-    # Trim to 100 with proportional category representation
-    if len(queries) > 100:
-        cats = Counter(q["category"] for q in queries)
-        selected = []
-        for cat in cats:
-            cat_qs = [q for q in queries if q["category"] == cat]
-            n = max(1, min(len(cat_qs), round(100 * len(cat_qs) / len(queries))))
-            random.seed(42)
-            random.shuffle(cat_qs)
-            selected.extend(cat_qs[:n])
-        
-        # If still over 100, trim; if under, add more from largest categories
-        if len(selected) > 100:
-            selected = selected[:100]
-        elif len(selected) < 100:
-            remaining = [q for q in queries if q not in selected]
-            random.shuffle(remaining)
-            selected.extend(remaining[:100 - len(selected)])
-        
-        queries = selected
+    # ═══════════════════════════════════════
+    # TIER 2: MEDIUM — partial names, abbreviations, no "TDS"/"BVZyme" prefix
+    # ═══════════════════════════════════════
+    for ing, data_list in ingredient_data.items():
+        short = ing.replace("TDS ", "").replace("BVZyme ", "").replace("BVzyme ", "").strip()
+        if short == ing:
+            continue
+        for d in data_list:
+            s = d["section"]
+            text = d["text"]
+            key = cat = q_en = q_fr = None
+            if s.startswith("dosage") and "ppm" in text.lower():
+                key = f"med_dosage_{ing}"
+                q_en = f"How much {short} should I add to dough?"
+                q_fr = f"Combien de {short} dois-je ajouter à la pâte ?"
+                cat = "dosage"
+            elif s.startswith("function") and len(text) > 30:
+                key = f"med_function_{ing}"
+                q_en = f"What does {short} do to the bread?"
+                q_fr = f"Que fait {short} au pain ?"
+                cat = "function"
+            elif s.startswith("application") and len(text) > 30:
+                key = f"med_application_{ing}"
+                q_en = f"Which products can I use {short} in?"
+                q_fr = f"Dans quels produits puis-je utiliser {short} ?"
+                cat = "application"
+            elif s.startswith("storage") and len(text) > 20:
+                key = f"med_storage_{ing}"
+                q_en = f"At what temperature should {short} be kept?"
+                q_fr = f"À quelle température garder {short} ?"
+                cat = "storage"
+            elif s.startswith("activity") and any(ch.isdigit() for ch in text):
+                key = f"med_activity_{ing}"
+                q_en = f"How many units per gram for {short}?"
+                q_fr = f"Combien d'unités par gramme pour {short} ?"
+                cat = "activity"
+            elif "product description" in s and len(text) > 20:
+                key = f"med_desc_{ing}"
+                q_en = f"Tell me about {short}, what kind of enzyme?"
+                q_fr = f"Parlez-moi de {short}, quel type d'enzyme ?"
+                cat = "product_description"
+            if key and key not in seen_keys:
+                seen_keys.add(key)
+                queries.append({
+                    "query_en": q_en, "query_fr": q_fr,
+                    "expected_ingredient": ing,
+                    "ground_truth_text": text,
+                    "expected_section": cat, "category": cat,
+                    "difficulty": "medium", "chunk_index": d["chunk_index"],
+                })
     
-    return queries
+    # ═══════════════════════════════════════
+    # TIER 3: HARD — natural language, problem-solving, NO ingredient name
+    # ═══════════════════════════════════════
+    for ing, data_list in ingredient_data.items():
+        for d in data_list:
+            s = d["section"]
+            text = d["text"]
+            key = cat = q_en = q_fr = None
+            if s.startswith("function") and "gluten" in text.lower():
+                key = f"hard_gluten_{ing}"
+                q_en = "Which enzyme improves gluten strength and gas retention?"
+                q_fr = "Quel enzyme améliore la force du gluten et la rétention de gaz ?"
+                cat = "function"
+            elif s.startswith("function") and "volume" in text.lower():
+                key = f"hard_volume_{ing}"
+                q_en = "My bread has low volume, which enzyme increases oven spring?"
+                q_fr = "Mon pain a un faible volume, quel enzyme augmente le développement au four ?"
+                cat = "function"
+            elif s.startswith("application") and "biscuit" in text.lower():
+                key = f"hard_biscuit_{ing}"
+                q_en = "I need an enzyme for biscuit production, what do you recommend?"
+                q_fr = "J'ai besoin d'un enzyme pour la production de biscuits, que recommandez-vous ?"
+                cat = "application"
+            elif s.startswith("application") and "croissant" in text.lower():
+                key = f"hard_croissant_{ing}"
+                q_en = "Which enzyme is suitable for croissant and puff pastry?"
+                q_fr = "Quel enzyme convient pour les croissants et la pâte feuilletée ?"
+                cat = "application"
+            elif s.startswith("function") and "fresh" in text.lower():
+                key = f"hard_fresh_{ing}"
+                q_en = "How can I extend the shelf life and freshness of my bread?"
+                q_fr = "Comment prolonger la durée de conservation et la fraîcheur de mon pain ?"
+                cat = "function"
+            elif s.startswith("function") and "soft" in text.lower():
+                key = f"hard_soft_{ing}"
+                q_en = "I want softer crumb texture, what enzyme should I use?"
+                q_fr = "Je veux une mie plus moelleuse, quel enzyme utiliser ?"
+                cat = "function"
+            elif s.startswith("effective material") and "xylanase" in text.lower():
+                key = f"hard_xylanase_{ing}"
+                q_en = "Do you have any xylanase-based product?"
+                q_fr = "Avez-vous un produit à base de xylanase ?"
+                cat = "effective_material"
+            elif s.startswith("effective material") and "lipase" in text.lower():
+                key = f"hard_lipase_{ing}"
+                q_en = "I'm looking for a lipase enzyme for bakery"
+                q_fr = "Je cherche une enzyme lipase pour la boulangerie"
+                cat = "effective_material"
+            elif s.startswith("effective material") and "amylase" in text.lower():
+                key = f"hard_amylase_{ing}"
+                q_en = "Which products contain amylase?"
+                q_fr = "Quels produits contiennent de l'amylase ?"
+                cat = "effective_material"
+            if key and key not in seen_keys:
+                seen_keys.add(key)
+                queries.append({
+                    "query_en": q_en, "query_fr": q_fr,
+                    "expected_ingredient": ing,
+                    "ground_truth_text": text,
+                    "expected_section": cat, "category": cat,
+                    "difficulty": "hard", "chunk_index": d["chunk_index"],
+                })
+    
+    # ═══════════════════════════════════════
+    # TIER 4: ADVERSARIAL — cross-ingredient comparison, confusion
+    # ═══════════════════════════════════════
+    all_ings = list(ingredient_data.keys())
+    random.seed(42)
+    for i in range(min(15, len(all_ings) - 1)):
+        ing1 = all_ings[i]
+        ing2 = all_ings[(i + 7) % len(all_ings)]
+        if ing1 == ing2:
+            continue
+        s1 = {d["section"].split()[0] for d in ingredient_data[ing1] if d["section"]}
+        s2 = {d["section"].split()[0] for d in ingredient_data[ing2] if d["section"]}
+        common = s1 & s2
+        if "dosage" in common:
+            dd = [d for d in ingredient_data[ing1] if d["section"].startswith("dosage")]
+            if dd:
+                key = f"adv_dosage_{ing1}_{ing2}"
+                if key not in seen_keys:
+                    seen_keys.add(key)
+                    queries.append({
+                        "query_en": f"Compare dosage of {ing1} vs {ing2}, which needs more?",
+                        "query_fr": f"Comparez le dosage de {ing1} et {ing2}, lequel nécessite plus ?",
+                        "expected_ingredient": ing1,
+                        "ground_truth_text": dd[0]["text"],
+                        "expected_section": "dosage", "category": "dosage",
+                        "difficulty": "adversarial", "chunk_index": dd[0]["chunk_index"],
+                    })
+        if "function" in common:
+            fd = [d for d in ingredient_data[ing2] if d["section"].startswith("function")]
+            if fd:
+                key = f"adv_func_{ing1}_{ing2}"
+                if key not in seen_keys:
+                    seen_keys.add(key)
+                    queries.append({
+                        "query_en": f"Is {ing2} better than {ing1} for improving texture?",
+                        "query_fr": f"Est-ce que {ing2} est meilleur que {ing1} pour la texture ?",
+                        "expected_ingredient": ing2,
+                        "ground_truth_text": fd[0]["text"],
+                        "expected_section": "function", "category": "function",
+                        "difficulty": "adversarial", "chunk_index": fd[0]["chunk_index"],
+                    })
+    
+    # ── Balance to ~100 with difficulty distribution ──
+    target = {"easy": 40, "medium": 25, "hard": 20, "adversarial": 15}
+    selected = []
+    random.seed(42)
+    for diff, n in target.items():
+        pool = [q for q in queries if q["difficulty"] == diff]
+        random.shuffle(pool)
+        selected.extend(pool[:n])
+    if len(selected) < 100:
+        remaining = [q for q in queries if q not in selected]
+        random.shuffle(remaining)
+        selected.extend(remaining[:100 - len(selected)])
+    return selected[:100]
 
 
 # ═══════════════════════════════════════════════════════════
@@ -601,9 +769,14 @@ if __name__ == "__main__":
     print(f"Generated {len(queries)} queries.\n")
     
     cats = Counter(q["category"] for q in queries)
+    diffs = Counter(q.get("difficulty", "easy") for q in queries)
     print("Category distribution:")
     for cat, count in sorted(cats.items(), key=lambda x: -x[1]):
         print(f"  {cat}: {count}")
+    
+    print("\nDifficulty distribution:")
+    for diff in ["easy", "medium", "hard", "adversarial"]:
+        print(f"  {diff}: {diffs.get(diff, 0)}")
     
     # Check ingredient coverage
     ing_counts = Counter(q["expected_ingredient"] for q in queries)

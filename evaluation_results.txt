@@ -1,6 +1,6 @@
 ======================================================================
 RAG SYSTEM EVALUATION REPORT
-Date: 2026-02-28 | Queries: 100 | Time: 37.6s
+Date: 2026-02-28 | Queries: 100 | Time: 23.3s
 ======================================================================
 
 CONFIGURATION
@@ -15,26 +15,20 @@ Relevance: STRICT (ingredient + content must match)
 
 QUERY DISTRIBUTION
 ----------------------------------------
-  product_description      :  11 queries
-  effective_material       :  11 queries
-  application              :  11 queries
-  function                 :  11 queries
-  allergens                :  11 queries
-  dosage                   :  10 queries
-  activity                 :  10 queries
-  packaging                :   9 queries
-  storage                  :   6 queries
-  aa_conversion            :   2 queries
-  properties               :   1 queries
+  function                 :  30 queries
+  dosage                   :  12 queries
+  effective_material       :  12 queries
+  application              :  12 queries
+  activity                 :   9 queries
+  product_description      :   8 queries
+  storage                  :   7 queries
+  packaging                :   4 queries
+  allergens                :   3 queries
+  aa_conversion            :   1 queries
   important_points         :   1 queries
-  aa_dosage_table          :   1 queries
-  mode_emploi              :   1 queries
-  limitations              :   1 queries
   alternatives             :   1 queries
-  legal                    :   1 queries
-  recommendations          :   1 queries
   TOTAL                    : 100 queries
-  Ingredient coverage: 29 unique ingredients
+  Ingredient coverage: 34 unique ingredients
 
 ======================================================================
 A) UNFILTERED RETRIEVAL METRICS (pure semantic search)
@@ -42,15 +36,15 @@ A) UNFILTERED RETRIEVAL METRICS (pure semantic search)
 
    K |   Hit Rate |      MRR |      P@K |      R@K |   NDCG@K
 ----------------------------------------------------------
-   1 |     42.00% |   0.4200 |   0.4200 |   42.00% |   0.4200
-   3 |     68.00% |   0.5333 |   0.2267 |   68.00% |   0.5709
-   5 |     75.00% |   0.5493 |   0.1540 |   75.00% |   0.6080
-  10 |     80.00% |   0.5570 |   0.0860 |   80.00% |   0.6384
+   1 |     25.00% |   0.2500 |   0.2500 |   25.00% |   0.2500
+   3 |     48.00% |   0.3600 |   0.1633 |   48.00% |   0.3962
+   5 |     61.00% |   0.3895 |   0.1240 |   61.00% |   0.4495
+  10 |     68.00% |   0.3991 |   0.0720 |   68.00% |   0.4820
 
 Context Precision (ingredient accuracy):
-  @K=1: 87.00%
-  @K=3: 56.00%
-  @K=5: 43.40%
+  @K=1: 59.00%
+  @K=3: 44.67%
+  @K=5: 38.20%
 
 ======================================================================
 B) FILTERED RETRIEVAL METRICS (metadata filter on ingredient)
@@ -59,9 +53,9 @@ B) FILTERED RETRIEVAL METRICS (metadata filter on ingredient)
    K |   Hit Rate |      MRR |      P@K |      R@K |   NDCG@K
 ----------------------------------------------------------
    1 |     48.00% |   0.4800 |   0.4800 |   48.00% |   0.4800
-   3 |     78.00% |   0.6150 |   0.2700 |   78.00% |   0.6738
-   5 |     84.00% |   0.6295 |   0.1840 |   84.00% |   0.7203
-  10 |     93.00% |   0.6404 |   0.1030 |   93.00% |   0.7547
+   3 |     78.00% |   0.6200 |   0.2700 |   78.00% |   0.6764
+   5 |     87.00% |   0.6400 |   0.1840 |   87.00% |   0.7216
+  10 |     94.00% |   0.6493 |   0.1000 |   94.00% |   0.7476
 
 Context Precision (ingredient accuracy):
   @K=1: 100.00%
@@ -74,10 +68,10 @@ C) FILTERED + RERANKED METRICS (cross-encoder reranking)
 
    K |   Hit Rate |      MRR |      P@K |      R@K |   NDCG@K
 ----------------------------------------------------------
-   1 |     89.00% |   0.8900 |   0.8900 |   89.00% |   0.8900
-   3 |     96.00% |   0.9250 |   0.3467 |   96.00% |   0.9807
-   5 |     97.00% |   0.9275 |   0.2120 |   97.00% |   0.9893
-  10 |     97.00% |   0.9275 |   0.1080 |   97.00% |   0.9952
+   1 |     78.00% |   0.7800 |   0.7800 |   78.00% |   0.7800
+   3 |     92.00% |   0.8450 |   0.3133 |   92.00% |   0.8757
+   5 |     93.00% |   0.8475 |   0.1960 |   93.00% |   0.8929
+  10 |     98.00% |   0.8548 |   0.1050 |   98.00% |   0.9157
 
 Context Precision (ingredient accuracy):
   @K=1: 100.00%
@@ -90,172 +84,209 @@ FILTERING IMPACT ANALYSIS
 
 Metric @K=3                    |   Unfiltered |     Filtered |     Reranked
 --------------------------------------------------------------------------------
-  Hit Rate                     |       0.6800 |       0.7800 |       0.9600
-  MRR                          |       0.5333 |       0.6150 |       0.9250
-  Precision                    |       0.2267 |       0.2700 |       0.3467
-  Recall                       |       0.6800 |       0.7800 |       0.9600
-  NDCG                         |       0.5709 |       0.6738 |       0.9807
-  Context Precision            |       0.5600 |       1.0000 |       1.0000
+  Hit Rate                     |       0.4800 |       0.7800 |       0.9200
+  MRR                          |       0.3600 |       0.6200 |       0.8450
+  Precision                    |       0.1633 |       0.2700 |       0.3133
+  Recall                       |       0.4800 |       0.7800 |       0.9200
+  NDCG                         |       0.3962 |       0.6764 |       0.8757
+  Context Precision            |       0.4467 |       1.0000 |       1.0000
 
 Per-Category Strict Hit Rate @K=3:
   Category                  |   Unfiltered |     Filtered |     Reranked
   ----------------------------------------------------------------------
-  aa_conversion             |     2/2     |     2/2     |     2/2    
-  aa_dosage_table           |     1/1     |     1/1     |     1/1    
-  activity                  |     2/10    |     2/10    |    10/10   
-  allergens                 |    10/11    |    11/11    |    11/11   
+  aa_conversion             |     1/1     |     1/1     |     1/1    
+  activity                  |     1/9     |     2/9     |     4/9    
+  allergens                 |     3/3     |     3/3     |     3/3    
   alternatives              |     1/1     |     1/1     |     1/1    
-  application               |     7/11    |    10/11    |    10/11   
-  dosage                    |    10/10    |    10/10    |    10/10   
-  effective_material        |     3/11    |     5/11    |    11/11   
-  function                  |     7/11    |     8/11    |    11/11   
+  application               |     8/12    |    10/12    |    11/12   
+  dosage                    |    10/12    |    11/12    |    12/12   
+  effective_material        |     1/12    |     8/12    |    12/12   
+  function                  |     7/30    |    23/30    |    28/30   
   important_points          |     0/1     |     0/1     |     1/1    
-  legal                     |     0/1     |     0/1     |     0/1    
-  limitations               |     1/1     |     1/1     |     1/1    
-  mode_emploi               |     1/1     |     1/1     |     1/1    
-  packaging                 |     8/9     |     9/9     |     9/9    
-  product_description       |    10/11    |    11/11    |    11/11   
-  properties                |     0/1     |     0/1     |     0/1    
-  recommendations           |     0/1     |     0/1     |     0/1    
-  storage                   |     5/6     |     6/6     |     6/6    
+  packaging                 |     4/4     |     4/4     |     4/4    
+  product_description       |     8/8     |     8/8     |     8/8    
+  storage                   |     4/7     |     7/7     |     7/7    
 
 Similarity Score Distribution (Top-1):
-  Unfiltered: Mean=0.7913, Median=0.7954, Min=0.6420, Max=0.9270
-  Filtered:   Mean=0.7879, Median=0.7867, Min=0.6206, Max=0.9270
+  Unfiltered: Mean=0.6733, Median=0.6905, Min=0.4419, Max=0.9028
+  Filtered:   Mean=0.6532, Median=0.6766, Min=0.3498, Max=0.9028
 
 
 ======================================================================
-LLM FAITHFULNESS (15 samples, filtered retrieval)
+LLM FAITHFULNESS (12 samples, filtered retrieval)
 ======================================================================
 
-Average Faithfulness Score: 16.67%
-Refusal Rate: 26.67%
-Correct Refusals (no relevant retrieval): 2
-Incorrect Refusals (had relevant retrieval): 2
+Average Faithfulness Score: 0.00%
+Refusal Rate: 0.00%
+Correct Refusals (no relevant retrieval): 0
+Incorrect Refusals (had relevant retrieval): 0
 
-Q14: Combien de acide ascorbique pour 500 kg de farine ?
+Q20: Combien de acide ascorbique pour 50 kg de farine ?
   Expected Ingredient: acide ascorbique
-  Ground Truth: Poids Farine: 500 kg | 50 ppm: 25 g | 75 ppm: 37,5 g | 100 ppm: 50 g | 150 ppm: 
-  Faithfulness: 100%
-  Refused: False, Retrieval had answer: True
-  LLM Answer: Pour 500 kg de farine :
-
-- 50 ppm → 25 g d’acide ascorbique  
-- 75 ppm → 37,5 g d’acide ascorbique  
-- 100 ppm → 50 g d’acide ascorbique  
-- 150 ppm → 75 g d’acide ascorbique...
-
-Q13: Quel est le dosage de acide ascorbique pour glutenique ?
-  Expected Ingredient: acide ascorbique
-  Ground Truth: Column 4: glutenique
+  Ground Truth: Poids Farine: 50 kg | 50 ppm: 2,5 g | 75 ppm: 3,75 g | 100 ppm: 5 g | 150 ppm: 7
   Faithfulness: 0%
-  Refused: True, Retrieval had answer: True
-  LLM Answer: Information non disponible....
+  Refused: False, Retrieval had answer: True
+  LLM Answer: ERROR: unauthorized...
 
-Q43: Quelle est l'activité enzymatique de BVZyme TDS L55pdf ?
-  Expected Ingredient: BVZyme TDS L55pdf
-  Ground Truth: Activity 1120 U/g
+Q12: Quelle est l'activité enzymatique de BVZyme TDS A FRESH202 ?
+  Expected Ingredient: BVZyme TDS A FRESH202
+  Ground Truth: Activity 10950 NMAU/g
   Faithfulness: 0%
   Refused: False, Retrieval had answer: False
-  LLM Answer: Son activité enzymatique est celle d’une phospholipase (lipase)....
+  LLM Answer: ERROR: unauthorized...
 
-Q75: Quels allergènes contient BVZyme GO MAX 63 TDS ?
-  Expected Ingredient: BVZyme GO MAX 63 TDS
+Q8: Quels allergènes contient BVZyme TDS L MAX X ?
+  Expected Ingredient: BVZyme TDS L MAX X
   Ground Truth: In compliance with the list of major allergens in Annex II, Regulation 1169/2011
   Faithfulness: 0%
-  Refused: True, Retrieval had answer: True
-  LLM Answer: Information non disponible....
+  Refused: False, Retrieval had answer: True
+  LLM Answer: ERROR: unauthorized...
 
-Q18: Quels sont les avantages de Acide ascorbique + enzymes comme alternative au acid
+Q37: Quels sont les avantages de Levain naturel comme alternative au acide ascorbique
   Expected Ingredient: acide ascorbique
-  Ground Truth: Alternative: Acide ascorbique + enzymes | Avantages: Synérgie optimale | Inconvé
+  Ground Truth: Alternative: Levain naturel | Avantages: Action douce, saveur | Inconvénients: T
   Faithfulness: 0%
   Refused: False, Retrieval had answer: True
-  LLM Answer: Avantage : une synergie optimale entre l’acide ascorbique et les enzymes....
+  LLM Answer: ERROR: unauthorized...
 
-  ... (10 more samples omitted)
+Q13: A quoi sert BVZyme TDS L MAX X en boulangerie ?
+  Expected Ingredient: BVZyme TDS L MAX X
+  Ground Truth: Application B V Zyme L MAX X® is used in bakery as it hydrolyzes esterbonds in g
+  Faithfulness: 0%
+  Refused: False, Retrieval had answer: True
+  LLM Answer: ERROR: unauthorized...
+
+  ... (7 more samples omitted)
 
 ======================================================================
 DETAILED RESULTS: FILTERED + RERANKED RETRIEVAL
 ======================================================================
 
---- MISSES (4 queries where ground truth NOT in Top-3, showing first 5) ---
+--- MISSES (8 queries where ground truth NOT in Top-3, showing first 5) ---
 
-Q1 [properties]: Quelles sont les propriétés principales de acide ascorbique ?
-  Expected: [acide ascorbique] Propriétés Principales  Action oxydante : Renforce le gluten par création de po
-  R1 [ing:✓ cnt:✗] (sim=3.0135) [acide ascorbique]: acide ascorbique. Acide Ascorbique (E300) Améliorant de Panification
-  R2 [ing:✓ cnt:✗] (sim=2.4997) [acide ascorbique]: acide ascorbique. Points Importants  L'acide ascorbique est ~90% détruit pendant la cuisson (n'appo
-  R3 [ing:✓ cnt:✗] (sim=1.9615) [acide ascorbique]: acide ascorbique. Résumé Général L'acide ascorbique (vitamine C) est un additif alimentaire autorisé
+Q44 [activity]: Combien d'unités par gramme pour AF110 ?
+  Expected: [BVZyme TDS AF110] Activity 150000 SKB/g
+  R1 [ing:✓ cnt:✗] (sim=1.8237) [BVZyme TDS AF110]: BVZyme TDS AF110. Physicochemical: Microbiology - Total plate count: <50 000UFC per g
+  R2 [ing:✓ cnt:✗] (sim=0.2469) [BVZyme TDS AF110]: BVZyme TDS AF110. Physicochemical: acceptable: 10m - ASR: <30 UFC per g
+  R3 [ing:✓ cnt:✗] (sim=-0.9729) [BVZyme TDS AF110]: BVZyme TDS AF110. Physicochemical: satisfactory: m - Coliforms at 30°C：<30 UFC per g
 
-Q19 [legal]: Quel est le statut légal de acide ascorbique ?
-  Expected: [acide ascorbique] Statut Légal  Autorisé en UE (Directive 2014/34/UE)  Autorisé en Tunisie (Norm
-  R1 [ing:✓ cnt:✗] (sim=2.3157) [acide ascorbique]: acide ascorbique. Limitations  Action limitée dans le temps (fermentation longue)  Inefficace sur 
-  R2 [ing:✓ cnt:✗] (sim=2.1299) [acide ascorbique]: acide ascorbique. Dosage Maximum Autorisé France/Belgique : 300 ppm Étiquetage : Obligatoire (E300 o
-  R3 [ing:✓ cnt:✗] (sim=1.4280) [acide ascorbique]: acide ascorbique. Réglementation
+Q49 [activity]: Combien d'unités par gramme pour A SOFT205 ?
+  Expected: [BVZyme TDS A SOFT205] Activity 11600 NMAU/g
+  R1 [ing:✓ cnt:✗] (sim=2.5417) [BVZyme TDS A SOFT205]: BVZyme TDS A SOFT205. Physicochemical: Microbiology - Total plate count: <50 000UFC per g
+  R2 [ing:✓ cnt:✗] (sim=1.7486) [BVZyme TDS A SOFT205]: BVZyme TDS A SOFT205. Physicochemical: acceptable: 10m - ASR: <30 UFC per g
+  R3 [ing:✓ cnt:✗] (sim=-0.0784) [BVZyme TDS A SOFT205]: BVZyme TDS A SOFT205. Physicochemical: Heavy metals - Mercury: <0,5 mg/kg
 
-Q20 [recommendations]: Quelles sont les recommandations pour acide ascorbique ?
-  Expected: [acide ascorbique] Recommandations pour ta Production Test et Validation 6. 1. Commencer par 50-75 
-  R1 [ing:✓ cnt:✗] (sim=2.1297) [acide ascorbique]: acide ascorbique. Points Importants  L'acide ascorbique est ~90% détruit pendant la cuisson (n'appo
-  R2 [ing:✓ cnt:✗] (sim=2.0231) [acide ascorbique]: acide ascorbique. Points de Contrôle  Vérifier la date d'utilisation avant application  Assurer l'
-  R3 [ing:✓ cnt:✗] (sim=1.8699) [acide ascorbique]: acide ascorbique. Alternatives et Complémentarité: Malte - Alternative: Malte | Avantages: Saveur, n
+Q54 [activity]: Combien d'unités par gramme pour A FRESH101 ?
+  Expected: [BVZyme TDS A FRESH101] Activity 10000 NMAU/g
+  R1 [ing:✓ cnt:✗] (sim=1.6061) [BVZyme TDS A FRESH101]: BVZyme TDS A FRESH101. Physicochemical: Microbiology - Total plate count: <50 000UFC per g
+  R2 [ing:✓ cnt:✗] (sim=0.6423) [BVZyme TDS A FRESH101]: BVZyme TDS A FRESH101. Physicochemical: acceptable: 10m - ASR: <30 UFC per g
+  R3 [ing:✓ cnt:✗] (sim=-0.1532) [BVZyme TDS A FRESH101]: BVZyme TDS A FRESH101. Physicochemical: satisfactory: m - Coliforms at 30°C：<30 UFC per g
 
-Q61 [application]: A quoi sert BVZyme TDS AMG1400 en boulangerie ?
-  Expected: [BVZyme TDS AMG1400] Application B V Zyme A MG 1400 ® is glucoamylase that hydrolyzes(1,4) glucosidic
-  R1 [ing:✓ cnt:✗] (sim=3.4580) [BVZyme TDS AMG1400]: BVZyme TDS AMG1400. Packaging Carton box of 25 kg .
-  R2 [ing:✓ cnt:✗] (sim=3.2470) [BVZyme TDS AMG1400]: BVZyme TDS AMG1400. Function I mprove the crust color into golden brownish and the crumb color brigh
-  R3 [ing:✓ cnt:✗] (sim=2.9326) [BVZyme TDS AMG1400]: BVZyme TDS AMG1400. Product Description Enzyme preparation based on A m yloglucosidase
+Q63 [activity]: Combien d'unités par gramme pour TG881 TDS(1) ?
+  Expected: [BVZyme  TG881 TDS(1)] Activity 200 U/ g
+  R1 [ing:✓ cnt:✗] (sim=4.0557) [BVZyme  TG881 TDS(1)]: BVZyme  TG881 TDS(1). Physicochemical Moisture: <15%: Microbiology - Total plate count: <50 000UFC p
+  R2 [ing:✓ cnt:✗] (sim=3.2931) [BVZyme  TG881 TDS(1)]: BVZyme  TG881 TDS(1). Physicochemical Moisture: <15%: acceptable: 10m - ASR: <30 UFC per g
+  R3 [ing:✓ cnt:✗] (sim=2.4226) [BVZyme  TG881 TDS(1)]: BVZyme  TG881 TDS(1). Dosage 10 - 40 ppm
+
+Q64 [activity]: Combien d'unités par gramme pour AMG1400 ?
+  Expected: [BVZyme TDS AMG1400] Activity 8 0000 AGI /g
+  R1 [ing:✓ cnt:✗] (sim=1.4898) [BVZyme TDS AMG1400]: BVZyme TDS AMG1400. Physicochemical Moisture: <15%: Microbiology - Total plate count: <50 000UFC per
+  R2 [ing:✓ cnt:✗] (sim=0.2279) [BVZyme TDS AMG1400]: BVZyme TDS AMG1400. Physicochemical Moisture: <15%: acceptable: 10m - ASR: <30 UFC per g
+  R3 [ing:✓ cnt:✗] (sim=-0.3206) [BVZyme TDS AMG1400]: BVZyme TDS AMG1400. Physicochemical Moisture: <15%: satisfactory: m - Coliforms at 30°C：<30 UFC per 
+
+  ... (3 more misses omitted)
 
 
---- HITS (96 queries with ground truth in Top-3, showing first 10) ---
+--- HITS (92 queries with ground truth in Top-3, showing first 10) ---
 
-Q2 [important_points] Rank=1: Quels sont les points importants de acide ascorbique ?
-  [acide ascorbique] Points Importants  L'acide ascorbique est ~90% détruit pendant la cuisson (n'ap
-Q3 [dosage] Rank=1: Quel est le dosage de BVZyme TDS L MAX X ?
-  [BVZyme TDS L MAX X] Dosage - 2-20 ppm
-Q4 [dosage] Rank=1: Quel est le dosage de BVZyme TDS AF110 ?
-  [BVZyme TDS AF110] Dosage 2-12 ppm
-Q5 [dosage] Rank=1: Quel est le dosage de BVZyme TDS A SOFT205 ?
-  [BVZyme TDS A SOFT205] Dosage 15- 100 ppm
-Q6 [dosage] Rank=1: Quel est le dosage de TDS BVZyme HCB708 ?
+Q1 [dosage] Rank=1: Quel est le dosage de TDS BVZyme HCB708 ?
   [TDS BVZyme HCB708] Dosage 5-30 ppm
-Q7 [dosage] Rank=1: Quel est le dosage de BVZyme TDS L MAX65 ?
-  [BVZyme TDS L MAX65] Dosage 5- 5 0 ppm
-Q8 [dosage] Rank=1: Quel est le dosage de BVZyme GO MAX 63 TDS ?
-  [BVZyme GO MAX 63 TDS] Dosage 5-50 ppm
-Q9 [dosage] Rank=1: Quel est le dosage de BVZyme  TG883 TDS ?
-  [BVZyme  TG883 TDS] Dosage 5 - 30 ppm
-Q10 [dosage] Rank=1: Quel est le dosage de BVZyme TDS A SOFT305(1) ?
-  [BVZyme TDS A SOFT305(1)] Dosage Dosage range 15- 50 ppm ,suggest dosage 30ppm
-Q11 [dosage] Rank=1: Quel est le dosage de BVZyme TDS A FRESH202 ?
-  [BVZyme TDS A FRESH202] Dosage 1 0 - 90 ppm
+Q2 [storage] Rank=1: Comment conserver BVZymeTDSAF SX ?
+  [BVZymeTDSAF SX] Storage Date of minimum durability: 24 months. Store in a cool, dry place (below
+Q3 [effective_material] Rank=1: De quoi est fait BVZyme TDS AF330 ? Quel organisme le produit ?
+  [BVZyme TDS AF330] Effective material Fungal α -amylase produced by the fermentation of a selected 
+Q4 [product_description] Rank=1: Quel type d'enzyme est BVZyme GO MAX 65 ?
+  [BVZyme GO MAX 65] Product Description Enzyme preparation based on Glucose oxidase
+Q5 [product_description] Rank=1: Quel type d'enzyme est TDS BVzyme HCF500 ?
+  [TDS BVzyme HCF500] Product Description Enzyme preparation based on endo- xylanase.
+Q6 [storage] Rank=1: Comment conserver BVZyme TDS AMG1400 ?
+  [BVZyme TDS AMG1400] Storage Date of minimum durability: 24 months. Store in a cool, dry place (below
+Q7 [packaging] Rank=1: Quel est l'emballage de BVZyme TDS A FRESH101 ?
+  [BVZyme TDS A FRESH101] Package: Carton box of 25 kg
+Q8 [allergens] Rank=1: Quels allergènes contient BVZyme TDS L MAX X ?
+  [BVZyme TDS L MAX X] In compliance with the list of major allergens in Annex II, Regulation 1169/2011
+Q9 [function] Rank=1: Quelle est la fonction de BVZyme TDS AF110 ?
+  [BVZyme TDS AF110] Function Increase volume, improve gassing power, enhance softness, assist in fer
+Q10 [allergens] Rank=1: Quels allergènes contient BVZyme TDS AF220 ?
+  [BVZyme TDS AF220] In compliance with the list of major allergens in Annex II of Regulation 1169/20
 
-  ... (86 more hits omitted)
+  ... (82 more hits omitted)
 
 
 ======================================================================
 UNFILTERED vs FILTERED: Cases where filtering HELPED
 ======================================================================
 
-  HELPED: Q22 [product_description]: Quel type d'enzyme est BVZyme  TG MAX64 TDS ?
-    Ingredient: BVZyme  TG MAX64 TDS
-  HELPED: Q34 [effective_material]: De quoi est fait BVZyme TDS A SOFT405 ? Quel organisme le pr
-    Ingredient: BVZyme TDS A SOFT405
-  HELPED: Q36 [effective_material]: De quoi est fait TDS BVzyme HCF MAX X ? Quel organisme le pr
-    Ingredient: TDS BVzyme HCF MAX X
-  HELPED: Q56 [application]: A quoi sert BVZyme TDS A SOFT405 en boulangerie ?
-    Ingredient: BVZyme TDS A SOFT405
-  HELPED: Q60 [application]: A quoi sert BVZyme TDS A SOFT205 en boulangerie ?
-    Ingredient: BVZyme TDS A SOFT205
-  HELPED: Q62 [application]: A quoi sert BVZyme TDS A SOFT305(1) en boulangerie ?
-    Ingredient: BVZyme TDS A SOFT305(1)
-  HELPED: Q64 [function]: Quelle est la fonction de TDS BVzyme HCF MAX63 ?
-    Ingredient: TDS BVzyme HCF MAX63
-  HELPED: Q75 [allergens]: Quels allergènes contient BVZyme GO MAX 63 TDS ?
-    Ingredient: BVZyme GO MAX 63 TDS
-  HELPED: Q90 [packaging]: Quel est l'emballage de BVZyme  TG883 TDS ?
-    Ingredient: BVZyme  TG883 TDS
-  HELPED: Q99 [storage]: Comment conserver TDS BVZyme HCB710 ?
+  HELPED: Q18 [function]: Quelle est la fonction de TDS BVzyme HCF500 ?
+    Ingredient: TDS BVzyme HCF500
+  HELPED: Q22 [application]: A quoi sert BVZyme TDS A FRESH101 en boulangerie ?
+    Ingredient: BVZyme TDS A FRESH101
+  HELPED: Q25 [storage]: Comment conserver TDS BVZyme HCB708 ?
+    Ingredient: TDS BVZyme HCB708
+  HELPED: Q39 [activity]: Quelle est l'activité enzymatique de TDS BVZyme HCB710 ?
     Ingredient: TDS BVZyme HCB710
+  HELPED: Q42 [function]: Que fait GOX 110 TDS(1) au pain ?
+    Ingredient: BVZyme  GOX 110 TDS(1)
+  HELPED: Q55 [storage]: À quelle température garder HCF400 ?
+    Ingredient: TDS BVzyme HCF400
+  HELPED: Q56 [storage]: À quelle température garder TG883 TDS ?
+    Ingredient: BVZyme  TG883 TDS
+  HELPED: Q57 [application]: Dans quels produits puis-je utiliser GO MAX 63 TDS ?
+    Ingredient: BVZyme GO MAX 63 TDS
+  HELPED: Q67 [effective_material]: Je cherche une enzyme lipase pour la boulangerie
+    Ingredient: BVZyme TDS L MAX63
+  HELPED: Q68 [function]: Quel enzyme améliore la force du gluten et la rétention de g
+    Ingredient: TDS BVzyme HCF MAX64
+  HELPED: Q69 [function]: Mon pain a un faible volume, quel enzyme augmente le dévelop
+    Ingredient: BVZyme  TG MAX64 TDS
+  HELPED: Q70 [function]: Mon pain a un faible volume, quel enzyme augmente le dévelop
+    Ingredient: BVZyme TDS A SOFT405
+  HELPED: Q71 [effective_material]: Je cherche une enzyme lipase pour la boulangerie
+    Ingredient: BVZyme TDS L MAX64
+  HELPED: Q72 [function]: Quel enzyme améliore la force du gluten et la rétention de g
+    Ingredient: TDS BVzyme HCF500
+  HELPED: Q73 [function]: Comment prolonger la durée de conservation et la fraîcheur d
+    Ingredient: BVZyme TDS A FRESH101
+  HELPED: Q74 [function]: Mon pain a un faible volume, quel enzyme augmente le dévelop
+    Ingredient: BVZyme TDS L55pdf
+  HELPED: Q75 [function]: Mon pain a un faible volume, quel enzyme augmente le dévelop
+    Ingredient: BVZyme TDS AF220
+  HELPED: Q76 [effective_material]: Avez-vous un produit à base de xylanase ?
+    Ingredient: TDS BVzyme HCF MAX63
+  HELPED: Q77 [function]: Mon pain a un faible volume, quel enzyme augmente le dévelop
+    Ingredient: BVZyme TDS L MAX65
+  HELPED: Q78 [function]: Je veux une mie plus moelleuse, quel enzyme utiliser ?
+    Ingredient: TDS L65pdf
+  HELPED: Q79 [function]: Mon pain a un faible volume, quel enzyme augmente le dévelop
+    Ingredient: BVZyme TDS L MAX X
+  HELPED: Q80 [effective_material]: Quels produits contiennent de l'amylase ?
+    Ingredient: BVZyme TDS AF220
+  HELPED: Q81 [effective_material]: Je cherche une enzyme lipase pour la boulangerie
+    Ingredient: BVZyme TDS L MAX X
+  HELPED: Q82 [effective_material]: Quels produits contiennent de l'amylase ?
+    Ingredient: BVZyme TDS AF110
+  HELPED: Q83 [function]: Comment prolonger la durée de conservation et la fraîcheur d
+    Ingredient: BVZyme TDS A FRESH202
+  HELPED: Q84 [effective_material]: Avez-vous un produit à base de xylanase ?
+    Ingredient: TDS BVzyme HCF400
+  HELPED: Q85 [function]: Comment prolonger la durée de conservation et la fraîcheur d
+    Ingredient: BVZyme TDS A SOFT305(1)
+  HELPED: Q88 [function]: Est-ce que BVZyme TDS L MAX X est meilleur que BVZyme  GOX 1
+    Ingredient: BVZyme TDS L MAX X
+  HELPED: Q93 [function]: Est-ce que BVZyme TDS L55pdf est meilleur que BVZyme  TG MAX
+    Ingredient: BVZyme TDS L55pdf
+  HELPED: Q95 [dosage]: Comparez le dosage de BVZyme TDS A FRESH101 et BVZyme TDS L 
+    Ingredient: BVZyme TDS A FRESH101
 
-  Filtering helped: 10 queries
+  Filtering helped: 30 queries
   Filtering hurt: 0 queries

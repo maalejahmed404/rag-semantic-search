@@ -115,7 +115,7 @@ The retrieval mechanism is heavily optimized to address the classic limitations 
 2. **HyDE (Hypothetical Document Embeddings)**: Instead of embedding the user's short query directly against long technical chunks, the LLM hallucinates a hypothetical, perfect technical document answer to the query. This hypothetical answer heavily aligns with the semantic structure of the actual technical chunks, significantly boosting the similarity match.
 3. **Dual-Language Querying (Cross-Lingual Retrieval)**: User queries are translated to run parallel vector searches in both English and French. All results (English semantic, French semantic, and HyDE) are retrieved, deduplicated, and ranked.
 4. **Resilient Fallbacks**: If the strict metadata filter yields insufficient results (due to naming mismatches), the chatbot autonomously falls back to a purely broad semantic search.
-5. **Cross-Encoder Reranking**: After retrieving 15 candidates, a cross-encoder model (`ms-marco-MiniLM-L-6-v2`) reranks them using the English translation of the query. Unlike bi-encoders that compare embeddings independently, cross-encoders jointly encode query-document pairs, dramatically improving content relevance. This boosted hit rate from 78% to **96%** at K=3.
+5. **Cross-Encoder Reranking**: After retrieving 15 candidates, a cross-encoder model (`ms-marco-MiniLM-L-6-v2`) reranks them using the English translation of the query. Unlike bi-encoders that compare embeddings independently, cross-encoders jointly encode query-document pairs, dramatically improving content relevance. This boosted hit rate from 78% to **92%** at K=3.
 
 
 ## 4. Evaluation Technique (`evaluation.py`)
@@ -128,12 +128,15 @@ Evaluating RAG in technical domains requires absolute precision. Our evaluation 
 
 Comparing pure semantic search to our filtered approach shows a massive boost in accuracy, pushing Context Precision to 100%, and driving overall recall and NDCG upward drastically.
 
-### Metrics Summary (100 queries, strict ground-truth validation):
+### Metrics Summary (100 queries across 4 difficulty tiers):
+
+Queries include 4 difficulty levels: **Easy** (exact ingredient name), **Medium** (abbreviated names), **Hard** (natural language, no ingredient name), and **Adversarial** (cross-ingredient comparison).
+
 | Approach | Hit Rate @K=3 | Context Precision @K=3 | MRR |
 |----------|-------------|----------------------|-----|
-| Semantic Search only | 68% | 56% | 0.533 |
-| + Metadata Filtering | 78% | 100% | 0.615 |
-| **+ Cross-Encoder Reranking** | **96%** | **100%** | **0.925** |
+| Semantic Search only | 48% | 45% | 0.360 |
+| + Metadata Filtering | 78% | 100% | 0.620 |
+| **+ Cross-Encoder Reranking** | **92%** | **100%** | **0.845** |
 
 
 ## 5. How to Run & Test
