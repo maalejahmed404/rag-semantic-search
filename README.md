@@ -135,11 +135,11 @@ Comparing pure semantic search to our filtered approach shows a massive boost in
 
 Queries include 4 difficulty levels: **Easy** (exact ingredient name), **Medium** (abbreviated names), **Hard** (natural language, no ingredient name), and **Adversarial** (cross-ingredient comparison).
 
-| Approach | Hit Rate @K=3 | Context Precision @K=3 | MRR |
-|----------|-------------|----------------------|-----|
-| Semantic Search only | 48% | 45% | 0.360 |
-| + Metadata Filtering | 78% | 100% | 0.620 |
-| **+ Cross-Encoder Reranking** | **92%** | **100%** | **0.845** |
+| Approach | Hit Rate @K=3 | MRR |
+|----------|-------------|-----|
+| Semantic Search only | 48% | 0.360 |
+| + Metadata Filtering | 78% | 0.620 |
+| **+ Cross-Encoder Reranking** | **92%** |  **0.845** |
 
 
 ## 5. How to Run & Test
